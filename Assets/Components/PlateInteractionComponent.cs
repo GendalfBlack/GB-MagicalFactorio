@@ -2,6 +2,15 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Classifies the interactions between tectonic plate regions by analysing flow directions and plate types.
+/// </summary>
+/// <remarks>
+/// The component combines data from <see cref="VoronoiComponent"/>, <see cref="PlateTectonicsComponent"/>,
+/// <see cref="PlateAssignerComponent"/>, and <see cref="PlateEdgeDetectorComponent"/> to derive
+/// convergent, divergent, transform, or unknown interactions.  Results are exposed both via a preview
+/// texture and structured debug data.
+/// </remarks>
 [ExecuteInEditMode]
 public class PlateInteractionComponent : MonoBehaviour
 {
@@ -46,6 +55,9 @@ public class PlateInteractionComponent : MonoBehaviour
     [Serializable]
     public struct InteractionEdgeInfo
     {
+        /// <summary>
+        /// Identifier for the first touching region.
+        /// </summary>
         public int regionA;
         public int regionB;
 
@@ -61,13 +73,19 @@ public class PlateInteractionComponent : MonoBehaviour
     // cached for CreateVoronoiMap()
     private Dictionary<int, Vector2> regionDirCache = new Dictionary<int, Vector2>();
 
+    /// <summary>
+    /// Public helper exposing <see cref="InferInteraction"/> for editor tooling.
+    /// </summary>
+    /// <param name="regionA">Identifier of the first region.</param>
+    /// <param name="regionB">Identifier of the neighbouring region.</param>
+    /// <returns>The inferred interaction classification.</returns>
     public InteractionType InferInteractionPublic(int regionA, int regionB)
     {
         return InferInteraction(regionA, regionB);
     }
 
     /// <summary>
-    /// Call this from the inspector button.
+    /// Generates interaction data and the corresponding preview texture.
     /// </summary>
     public void GenerateNow()
     {
@@ -211,6 +229,9 @@ public class PlateInteractionComponent : MonoBehaviour
     // -------------------------------------------------
     // Core logic per boundary pixel
     // -------------------------------------------------
+    /// <summary>
+    /// Classifies an individual boundary pixel and flags the appropriate masks.
+    /// </summary>
     private void ClassifyEdgePixel(
         int x, int y,
         int regionA,
@@ -245,6 +266,9 @@ public class PlateInteractionComponent : MonoBehaviour
     // -------------------------------------------------
     // Deduplicate boundaries and store their info
     // -------------------------------------------------
+    /// <summary>
+    /// Registers an unordered region pair and stores the interaction metadata for debugging.
+    /// </summary>
     private void RegisterPair(int rawA, int rawB, Dictionary<long, InteractionEdgeInfo> dict)
     {
         int a = rawA < rawB ? rawA : rawB;
@@ -279,6 +303,12 @@ public class PlateInteractionComponent : MonoBehaviour
     // -------------------------------------------------
     // Interaction classification
     // -------------------------------------------------
+    /// <summary>
+    /// Determines the interaction type between two regions based on their flow vectors.
+    /// </summary>
+    /// <param name="regionA">Identifier of the first region.</param>
+    /// <param name="regionB">Identifier of the second region.</param>
+    /// <returns>The inferred <see cref="InteractionType"/>.</returns>
     private InteractionType InferInteraction(int regionA, int regionB)
     {
         Vector2 aDir = regionDirCache.TryGetValue(regionA, out var ad) ? ad : Vector2.zero;
@@ -314,6 +344,9 @@ public class PlateInteractionComponent : MonoBehaviour
     // -------------------------------------------------
     // Texture building
     // -------------------------------------------------
+    /// <summary>
+    /// Builds a debug texture highlighting the interaction type for each boundary pixel.
+    /// </summary>
     private Texture2D BuildInteractionTexture(
         int w,
         int h,
@@ -374,6 +407,11 @@ public class PlateInteractionComponent : MonoBehaviour
     // -------------------------------------------------
     // Safe pull of region directions from flowSource
     // -------------------------------------------------
+    /// <summary>
+    /// Attempts to obtain the region flow directions from the supplied flow component.
+    /// </summary>
+    /// <param name="flow">Flow component providing directional data.</param>
+    /// <returns>A dictionary mapping region identifiers to average flow directions.</returns>
     private Dictionary<int, Vector2> GetRegionFlowDirectionsSafe(PlateTectonicsComponent flow)
     {
         // EXPECTED API IN PlateTectonicsComponent:
@@ -393,11 +431,17 @@ public class PlateInteractionComponent : MonoBehaviour
     }
 
     // Public getters for others if needed
+    /// <summary>
+    /// Returns the cached interaction preview texture.
+    /// </summary>
     public Texture2D GetInteractionTexture()
     {
         return interactionPreviewTexture;
     }
 
+    /// <summary>
+    /// Provides the structured interaction debug list.
+    /// </summary>
     public List<InteractionEdgeInfo> GetInteractionsDebug()
     {
         return interactionsDebug;

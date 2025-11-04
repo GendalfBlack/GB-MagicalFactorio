@@ -1,6 +1,15 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Generates a debug-friendly flow field for plate tectonics based on the output of a
+/// <see cref="VoronoiComponent"/> and an optional shared seed.
+/// </summary>
+/// <remarks>
+/// The component builds a per-region flow direction that other systems (for example
+/// <see cref="PlateInteractionComponent"/>) can query.  The flow directions are visualised via a
+/// texture of arrows for editor inspection.
+/// </remarks>
 [ExecuteInEditMode]
 public class PlateTectonicsComponent : MonoBehaviour
 {
@@ -25,15 +34,35 @@ public class PlateTectonicsComponent : MonoBehaviour
     [System.Serializable]
     public struct RegionFlowData
     {
+        /// <summary>
+        /// The region identifier coming from the Voronoi diagram.
+        /// </summary>
         public int regionId;
+
+        /// <summary>
+        /// The centroid of the region in pixel coordinates.
+        /// </summary>
         public Vector2 center;
+
+        /// <summary>
+        /// The average flow direction of the region, expressed as a unit vector.
+        /// </summary>
         public Vector2 direction;
     }
 
     private List<RegionFlowData> regionsFlowData = new List<RegionFlowData>();
     #endregion
 
-    public Dictionary<int, Vector2> GetRegionFlowDirections() 
+    #region Public API
+    /// <summary>
+    /// Returns a dictionary mapping region identifiers to their computed flow directions.
+    /// </summary>
+    /// <remarks>
+    /// If <see cref="CreateFlowDirectionsOnVoronoiMap"/> has not been executed yet, the dictionary will
+    /// be empty.  The returned dictionary is a copy and may be modified by callers without affecting the
+    /// component.
+    /// </remarks>
+    public Dictionary<int, Vector2> GetRegionFlowDirections()
     {
         var dict = new Dictionary<int, Vector2>();
         foreach (var rd in regionsFlowData)
@@ -44,6 +73,14 @@ public class PlateTectonicsComponent : MonoBehaviour
     }
 
 
+    /// <summary>
+    /// Generates flow vectors for each Voronoi region using the configured seed and settings.
+    /// </summary>
+    /// <remarks>
+    /// This method ensures that the Voronoi data is present, generates a flow field via
+    /// <see cref="FlowFieldData.GenerateFlowFieldFromVoronoi"/>, stores the results for later queries and
+    /// creates a debug texture with arrow glyphs.
+    /// </remarks>
     public void CreateFlowDirectionsOnVoronoiMap()
     {
         VoronoiGenerator.VoronoiResult voroData;
@@ -78,12 +115,20 @@ public class PlateTectonicsComponent : MonoBehaviour
 
         Debug.Log($"FlowField: generated {regionsFlowData.Count} flow vectors using shared seed {seedToUse}.");
     }
+    #endregion
 
+    #region Private Helpers
+    /// <summary>
+    /// Validates the component state and acquires the necessary data to generate flow vectors.
+    /// </summary>
+    /// <param name="voroData">On success, receives the Voronoi data used to build the flow field.</param>
+    /// <param name="seedToUse">On success, receives the seed that should be used for deterministic generation.</param>
+    /// <returns><see langword="true"/> if generation can continue; otherwise <see langword="false"/>.</returns>
     private bool CanGenerateFlow(out VoronoiGenerator.VoronoiResult voroData, out int seedToUse)
     {
         if (voronoiSource == null)
-        { 
-            voronoiSource = GetComponent<VoronoiComponent>(); 
+        {
+            voronoiSource = GetComponent<VoronoiComponent>();
         }
 
         if (seedSource == null)
@@ -113,6 +158,13 @@ public class PlateTectonicsComponent : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Builds a texture that visualises the flow field as colored Voronoi regions with arrows.
+    /// </summary>
+    /// <param name="flowField">The generated flow field data.</param>
+    /// <param name="arrowLen">The arrow length in pixels.</param>
+    /// <param name="arrowThick">The arrow thickness in pixels.</param>
+    /// <returns>A texture representing the flow field for debugging purposes.</returns>
     private Texture2D BuildDebugTexture(
         FlowFieldData.FlowFieldResult flowField,
         int arrowLen,
@@ -161,6 +213,11 @@ public class PlateTectonicsComponent : MonoBehaviour
         return tex;
     }
 
+    /// <summary>
+    /// Generates a deterministic pastel color based on the provided region identifier.
+    /// </summary>
+    /// <param name="seed">The identifier used to seed the color generation.</param>
+    /// <returns>A pastel <see cref="Color"/> used to draw the region.</returns>
     private Color RandomPastelColor(int seed)
     {
         unchecked
@@ -173,6 +230,17 @@ public class PlateTectonicsComponent : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Draws a single arrow into the pixel buffer.
+    /// </summary>
+    /// <param name="pixels">The pixel array that represents the texture.</param>
+    /// <param name="w">Texture width in pixels.</param>
+    /// <param name="h">Texture height in pixels.</param>
+    /// <param name="center">The starting point of the arrow.</param>
+    /// <param name="dir">The direction of the arrow.</param>
+    /// <param name="length">Arrow length in pixels.</param>
+    /// <param name="thick">Arrow thickness in pixels.</param>
+    /// <param name="col">Arrow color.</param>
     private void DrawArrowOnPixels(
         Color[] pixels,
         int w,
@@ -197,6 +265,16 @@ public class PlateTectonicsComponent : MonoBehaviour
         DrawLine(pixels, w, h, end, headR, thick, col);
     }
 
+    /// <summary>
+    /// Draws a line onto the pixel buffer using a Bresenham-style rasterisation.
+    /// </summary>
+    /// <param name="pixels">The target pixel buffer.</param>
+    /// <param name="w">Texture width in pixels.</param>
+    /// <param name="h">Texture height in pixels.</param>
+    /// <param name="a">Line starting point.</param>
+    /// <param name="b">Line ending point.</param>
+    /// <param name="thick">Line thickness in pixels.</param>
+    /// <param name="col">The color to apply.</param>
     private void DrawLine(
         Color[] pixels,
         int w,
@@ -236,4 +314,5 @@ public class PlateTectonicsComponent : MonoBehaviour
             if (e2 < dx) { err += dx; y0 += sy; }
         }
     }
+    #endregion
 }
