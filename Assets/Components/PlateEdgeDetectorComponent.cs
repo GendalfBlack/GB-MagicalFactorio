@@ -2,6 +2,14 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Identifies tectonic plate boundaries between Voronoi regions and produces debug visualisations.
+/// </summary>
+/// <remarks>
+/// The component relies on <see cref="VoronoiComponent"/> data for region topology and
+/// <see cref="PlateAssignerComponent"/> for plate membership.  It classifies boundaries as same-plate or
+/// different-plate and exposes both a texture and structured edge information.
+/// </remarks>
 [ExecuteInEditMode]
 public class PlateEdgeDetectorComponent : MonoBehaviour
 {
@@ -30,7 +38,7 @@ public class PlateEdgeDetectorComponent : MonoBehaviour
     public List<PlateEdgeInfo> edgesDebug = new List<PlateEdgeInfo>();
 
     // INTERNAL
-    // We’ll build this once per CreateVoronoiMap so other systems can query.
+    // We'll build this once per CreateVoronoiMap so other systems can query.
     private Dictionary<int, PlateAssignerComponent.PlateType> regionToPlateCached =
         new Dictionary<int, PlateAssignerComponent.PlateType>();
 
@@ -38,6 +46,9 @@ public class PlateEdgeDetectorComponent : MonoBehaviour
     [Serializable]
     public struct PlateEdgeInfo
     {
+        /// <summary>
+        /// Identifier of the first region in contact.
+        /// </summary>
         public int regionA;
         public int regionB;
 
@@ -49,7 +60,7 @@ public class PlateEdgeDetectorComponent : MonoBehaviour
     }
 
     /// <summary>
-    /// Call this from the custom inspector button.
+    /// Generates the edge data and preview textures.
     /// </summary>
     public void GenerateNow()
     {
@@ -97,7 +108,7 @@ public class PlateEdgeDetectorComponent : MonoBehaviour
         foreach (var kvp in plateMap)
             regionToPlateCached[kvp.Key] = kvp.Value;
 
-        // We’ll build:
+        // We'll build:
         // - edge mask pixels with info whether it's same-plate or diff-plate
         // - adjacency list of unique boundaries
         var sameMask = new bool[w * h];
@@ -166,7 +177,7 @@ public class PlateEdgeDetectorComponent : MonoBehaviour
     }
 
     /// <summary>
-    /// Marks the pixel as boundary. We decide if it's samePlate or diffPlate.
+    /// Marks the pixel as a boundary and records if the adjoining regions share the same plate type.
     /// </summary>
     private void MarkEdgePixel(
         bool[] sameMask,
@@ -198,8 +209,7 @@ public class PlateEdgeDetectorComponent : MonoBehaviour
     }
 
     /// <summary>
-    /// Registers an unordered pair of touching regions into the uniquePairs dict.
-    /// We also cache their plate types.
+    /// Registers an unordered pair of touching regions and caches their plate types.
     /// </summary>
     private void RegisterPair(Dictionary<long, PlateEdgeInfo> pairs, int regionA, int regionB)
     {
@@ -234,10 +244,7 @@ public class PlateEdgeDetectorComponent : MonoBehaviour
     }
 
     /// <summary>
-    /// Builds a texture where:
-    ///  - transparent background
-    ///  - same-plate edges drawn with samePlateEdgeColor
-    ///  - different-plate edges drawn with diffPlateEdgeColor (tectonic boundary)
+    /// Builds a texture showing same-plate and different-plate boundaries.
     /// </summary>
     Texture2D BuildEdgeTexture(
         bool[] sameMask,

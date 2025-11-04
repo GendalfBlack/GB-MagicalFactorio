@@ -2,6 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Assigns tectonic plate types to each Voronoi region and exposes preview information for debugging.
+/// </summary>
+/// <remarks>
+/// This component consumes the last <see cref="VoronoiComponent"/> result, distributes plate types according
+/// to configured weights, and generates a preview texture.  The deterministic seed can be shared with other
+/// systems via <see cref="WorldSeedComponent"/>.
+/// </remarks>
 [ExecuteInEditMode]
 public class PlateAssignerComponent : MonoBehaviour
 {
@@ -16,7 +24,14 @@ public class PlateAssignerComponent : MonoBehaviour
     [Serializable]
     public struct PlateWeight
     {
+        /// <summary>
+        /// The plate category that the weight applies to.
+        /// </summary>
         public PlateType plateType;
+
+        /// <summary>
+        /// Relative probability weight assigned to <see cref="plateType"/>.
+        /// </summary>
         [Min(0f)] public float weight;
     }
 
@@ -45,6 +60,9 @@ public class PlateAssignerComponent : MonoBehaviour
 
     private Dictionary<int, PlateType> regionToPlate = new Dictionary<int, PlateType>();
 
+    /// <summary>
+    /// Assigns plate types to each Voronoi region and updates preview artifacts.
+    /// </summary>
     public void CreatePlateTypesOnVoronoiMap()
     {
         if (voronoiSource == null)
@@ -111,6 +129,13 @@ public class PlateAssignerComponent : MonoBehaviour
         Debug.Log($"PlateAssigner: Assigned {regionToPlate.Count} regions by shared seed {seedToUse}.");
     }
 
+    /// <summary>
+    /// Builds a deterministic list of plate types that matches the desired distribution for a region count.
+    /// </summary>
+    /// <param name="regionCount">Number of regions that require a plate type assignment.</param>
+    /// <param name="weights">Weight configuration describing the desired distribution.</param>
+    /// <param name="seed">Seed used to shuffle the resulting list for reproducibility.</param>
+    /// <returns>A list of plate types sized exactly to <paramref name="regionCount"/>.</returns>
     List<PlateType> BuildExactPlateList(int regionCount, PlateWeight[] weights, int seed)
     {
         var result = new List<PlateType>(regionCount);
@@ -181,6 +206,12 @@ public class PlateAssignerComponent : MonoBehaviour
         return result;
     }
 
+    /// <summary>
+    /// Retrieves the plate type for the Voronoi region located at the provided coordinates.
+    /// </summary>
+    /// <param name="x">X coordinate within the Voronoi map.</param>
+    /// <param name="y">Y coordinate within the Voronoi map.</param>
+    /// <returns>The associated <see cref="PlateType"/>; defaults to <see cref="PlateType.Continental"/> if none was assigned.</returns>
     public PlateType GetPlateTypeAt(int x, int y)
     {
         if (voronoiSource == null) return PlateType.Continental;
@@ -195,11 +226,22 @@ public class PlateAssignerComponent : MonoBehaviour
         return PlateType.Continental;
     }
 
+    /// <summary>
+    /// Returns the cached mapping from region identifier to plate type.
+    /// </summary>
     public Dictionary<int, PlateType> GetRegionPlateMap()
     {
         return regionToPlate;
     }
 
+    /// <summary>
+    /// Builds a texture that visualises the plate assignment per Voronoi region.
+    /// </summary>
+    /// <param name="regionMap">The Voronoi region map.</param>
+    /// <param name="w">Map width in pixels.</param>
+    /// <param name="h">Map height in pixels.</param>
+    /// <param name="regionToPlateMap">Mapping from region identifier to plate type.</param>
+    /// <returns>A texture ready for debug display.</returns>
     Texture2D BuildPlatePreviewTexture(
         int[,] regionMap,
         int w,
@@ -230,6 +272,9 @@ public class PlateAssignerComponent : MonoBehaviour
         return tex;
     }
 
+    /// <summary>
+    /// Returns a representative color for the provided plate type.
+    /// </summary>
     Color ColorForPlateType(PlateType t)
     {
         switch (t)
@@ -245,6 +290,9 @@ public class PlateAssignerComponent : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Deterministically shuffles a list using the provided seed.
+    /// </summary>
     void Shuffle<T>(List<T> list, int seed)
     {
         System.Random rng = (seed == 0) ? new System.Random() : new System.Random(seed);
