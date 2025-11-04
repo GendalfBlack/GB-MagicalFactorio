@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a7f908bc0b2a484fba3c17e3abb9d10, type: 3}
+  m_Name: Cold Rocky Coast
+  m_EditorClassIdentifier: 
+  biomeName: Cold Rocky Coast
+  debugColor: {r: 0.5, g: 0.5, b: 0.55, a: 1}
+  minTemperature01: 0.25
+  maxTemperature01: 0.45
+  minHumidity01: 0
+  maxHumidity01: 0.4
+  minHeight01: 0.35
+  maxHeight01: 0.4
+  requiresSnow: 0
+  minSnowMask01: 0

@@ -1,0 +1,187 @@
+[
+  {
+    "biomeName": "Permafrost Highlands",
+    "debugColor": {
+      "r": 0.75,
+      "g": 0.8,
+      "b": 0.9,
+      "a": 1.0
+    },
+
+    "minTemperature01": 0.00,
+    "maxTemperature01": 0.25,
+    "minHumidity01": 0.00,
+    "maxHumidity01": 1.00,
+
+    "minHeight01": 0.50,
+    "maxHeight01": 0.55,
+
+    "requiresSnow": true,
+    "minSnowMask01": 0.1
+  },
+
+  {
+    "biomeName": "High Alpine Ice / Glacier",
+    "debugColor": {
+      "r": 0.9,
+      "g": 0.95,
+      "b": 1.0,
+      "a": 1.0
+    },
+
+    "minTemperature01": 0.00,
+    "maxTemperature01": 0.25,
+    "minHumidity01": 0.00,
+    "maxHumidity01": 1.00,
+
+    "minHeight01": 0.55,
+    "maxHeight01": 1.00,
+
+    "requiresSnow": true,
+    "minSnowMask01": 0.2
+  },
+
+  {
+    "biomeName": "Polar Bare Ridge",
+    "debugColor": {
+      "r": 0.6,
+      "g": 0.65,
+      "b": 0.7,
+      "a": 1.0
+    },
+
+    "minTemperature01": 0.00,
+    "maxTemperature01": 0.25,
+    "minHumidity01": 0.00,
+    "maxHumidity01": 1.00,
+
+    "minHeight01": 0.50,
+    "maxHeight01": 1.00,
+
+    "requiresSnow": false,
+    "minSnowMask01": 0.0
+  },
+
+  {
+    "biomeName": "Alpine Scree (Dry)",
+    "debugColor": {
+      "r": 0.5,
+      "g": 0.5,
+      "b": 0.5,
+      "a": 1.0
+    },
+
+    "minTemperature01": 0.25,
+    "maxTemperature01": 0.45,
+    "minHumidity01": 0.00,
+    "maxHumidity01": 0.50,
+
+    "minHeight01": 0.50,
+    "maxHeight01": 1.00,
+
+    "requiresSnow": false,
+    "minSnowMask01": 0.0
+  },
+  {
+    "biomeName": "Alpine Wet Slopes",
+    "debugColor": {
+      "r": 0.4,
+      "g": 0.5,
+      "b": 0.45,
+      "a": 1.0
+    },
+
+    "minTemperature01": 0.25,
+    "maxTemperature01": 0.45,
+    "minHumidity01": 0.50,
+    "maxHumidity01": 1.00,
+
+    "minHeight01": 0.50,
+    "maxHeight01": 1.00,
+
+    "requiresSnow": false,
+    "minSnowMask01": 0.0
+  },
+
+  {
+    "biomeName": "Montane Dry Shrub / Steppe",
+    "debugColor": {
+      "r": 0.6,
+      "g": 0.55,
+      "b": 0.3,
+      "a": 1.0
+    },
+
+    "minTemperature01": 0.45,
+    "maxTemperature01": 0.70,
+    "minHumidity01": 0.00,
+    "maxHumidity01": 0.50,
+
+    "minHeight01": 0.50,
+    "maxHeight01": 1.00,
+
+    "requiresSnow": false,
+    "minSnowMask01": 0.0
+  },
+  {
+    "biomeName": "Montane Forest (Evergreen / Cloud Forest)",
+    "debugColor": {
+      "r": 0.1,
+      "g": 0.35,
+      "b": 0.15,
+      "a": 1.0
+    },
+
+    "minTemperature01": 0.45,
+    "maxTemperature01": 0.70,
+    "minHumidity01": 0.50,
+    "maxHumidity01": 1.00,
+
+    "minHeight01": 0.50,
+    "maxHeight01": 1.00,
+
+    "requiresSnow": false,
+    "minSnowMask01": 0.0
+  },
+
+  {
+    "biomeName": "Highland Desert Ridge",
+    "debugColor": {
+      "r": 0.7,
+      "g": 0.55,
+      "b": 0.2,
+      "a": 1.0
+    },
+
+    "minTemperature01": 0.70,
+    "maxTemperature01": 1.00,
+    "minHumidity01": 0.00,
+    "maxHumidity01": 0.50,
+
+    "minHeight01": 0.50,
+    "maxHeight01": 1.00,
+
+    "requiresSnow": false,
+    "minSnowMask01": 0.0
+  },
+  {
+    "biomeName": "Highland Tropical Ridgeforest",
+    "debugColor": {
+      "r": 0.0,
+      "g": 0.3,
+      "b": 0.0,
+      "a": 1.0
+    },
+
+    "minTemperature01": 0.70,
+    "maxTemperature01": 1.00,
+    "minHumidity01": 0.50,
+    "maxHumidity01": 1.00,
+
+    "minHeight01": 0.50,
+    "maxHeight01": 1.00,
+
+    "requiresSnow": false,
+    "minSnowMask01": 0.0
+  }
+]
