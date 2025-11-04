@@ -21,10 +21,8 @@ public class PlateAssignerComponent : MonoBehaviour
     }
 
     [Header("Source (auto)")]
-    [Tooltip("Має бути той самий об'єкт, що і VoronoiComponent.")]
     public VoronoiComponent voronoiSource;
 
-    [Tooltip("Глобальний сид світу (спільний для всіх генераторів).")]
     public WorldSeedComponent seedSource;
 
     [Header("Distribution Settings")]
@@ -38,12 +36,16 @@ public class PlateAssignerComponent : MonoBehaviour
     [Header("Output (read-only)")]
     public Texture2D platePreviewTexture;
 
-    [SerializeField] private List<int> regionIdsPreview = new List<int>();
-    [SerializeField] private List<PlateType> regionPlatesPreview = new List<PlateType>();
+    [SerializeField]
+    [HideInInspector]
+    private List<int> regionIdsPreview = new List<int>();
+    [SerializeField]
+    [HideInInspector]
+    private List<PlateType> regionPlatesPreview = new List<PlateType>();
 
     private Dictionary<int, PlateType> regionToPlate = new Dictionary<int, PlateType>();
 
-    public void AssignPlatesNow()
+    public void CreatePlateTypesOnVoronoiMap()
     {
         if (voronoiSource == null)
             voronoiSource = GetComponent<VoronoiComponent>();
@@ -65,10 +67,8 @@ public class PlateAssignerComponent : MonoBehaviour
             data = voronoiSource.GetLastResult();
         }
 
-        // беремо глобальний сид
         int seedToUse = (seedSource != null) ? seedSource.worldSeed : 0;
 
-        // 1. всі regionId
         List<int> allRegionIds = new List<int>(data.regions.Keys);
         if (allRegionIds.Count == 0)
         {
@@ -78,21 +78,17 @@ public class PlateAssignerComponent : MonoBehaviour
 
         int regionCount = allRegionIds.Count;
 
-        // 2. список плит з вагами
         List<PlateType> plateList = BuildExactPlateList(regionCount, plateWeights, seedToUse);
 
-        // 3. тасуємо regionIds і plateList
         Shuffle(allRegionIds, seedToUse);
         Shuffle(plateList, seedToUse + 1337);
 
-        // 4. мапимо
         regionToPlate.Clear();
         for (int i = 0; i < regionCount; i++)
         {
             regionToPlate[allRegionIds[i]] = plateList[i];
         }
 
-        // 5. оновити дебаг списки
         regionIdsPreview.Clear();
         regionPlatesPreview.Clear();
         foreach (var kvp in regionToPlate)
@@ -101,7 +97,6 @@ public class PlateAssignerComponent : MonoBehaviour
             regionPlatesPreview.Add(kvp.Value);
         }
 
-        // 6. прев'ю текстурка
         platePreviewTexture = BuildPlatePreviewTexture(
             data.regionMap,
             voronoiSource.width,

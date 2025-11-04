@@ -16,7 +16,7 @@ public class FlowFieldComponentEditor : Editor
 
         if (GUILayout.Button("Generate Flow Field"))
         {
-            comp.GenerateNow();
+            comp.CreateFlowDirectionsOnVoronoiMap();
             // позначимо об'єкт як змінений, щоб Unity дозволила зберегти сцену
             EditorUtility.SetDirty(comp);
 

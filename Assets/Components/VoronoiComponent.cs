@@ -16,6 +16,10 @@ public class VoronoiComponent : MonoBehaviour
     VoronoiGenerator.VoronoiResult lastResult;
 
     #region Inspector Fields
+    [Header("Sources (auto)")]
+    [Tooltip("Optional WorldSeedComponent to provide a seed for Voronoi generation.")]
+    public WorldSeedComponent seedSource;
+
     [Header("Voronoi Settings")]
     [Min(2)]
     [Tooltip("Width of the generated Voronoi map, in pixels.")]
@@ -36,10 +40,6 @@ public class VoronoiComponent : MonoBehaviour
     [Min(1)]
     [Tooltip("The minimum number of pixels a region must have to avoid being merged into a neighboring region.")]
     public int minRegionPixelCount = 6000;
-
-    [Header("Seed Source")]
-    [Tooltip("Optional WorldSeedComponent to provide a seed for Voronoi generation.")]
-    public WorldSeedComponent seedSource;
 
     [Header("Output (read-only)")]
     [Tooltip("The generated Voronoi texture.")]

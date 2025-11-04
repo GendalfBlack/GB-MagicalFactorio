@@ -84,7 +84,7 @@ public class PlateEdgeDetectorComponent : MonoBehaviour
         if (plateMap == null || plateMap.Count == 0)
         {
             Debug.LogWarning("PlateEdgeDetector: Plate data is empty. Generating plate data.");
-            plateSource.AssignPlatesNow();
+            plateSource.CreatePlateTypesOnVoronoiMap();
             plateMap = plateSource.GetRegionPlateMap();
         }
 

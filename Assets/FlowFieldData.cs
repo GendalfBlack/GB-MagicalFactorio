@@ -22,7 +22,7 @@ public static class FlowFieldData
     /// Build a flow field on top of an EXISTING VoronoiResult.
     /// No Voronoi generation here.
     /// </summary>
-    public static FlowFieldResult GenerateFromVoronoi(
+    public static FlowFieldResult GenerateFlowFieldFromVoronoi(
         VoronoiGenerator.VoronoiResult voro,
         int randomSeed = 0)
     {

@@ -16,7 +16,7 @@ public class PlateAssignerComponentEditor : Editor
 
         if (GUILayout.Button("Assign Plates Now"))
         {
-            comp.AssignPlatesNow();
+            comp.CreatePlateTypesOnVoronoiMap();
         }
 
         EditorGUILayout.HelpBox(

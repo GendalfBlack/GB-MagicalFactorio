@@ -4,6 +4,7 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class PlateTectonicsComponent : MonoBehaviour
 {
+    #region Inspector Fields
     [Tooltip("WorldSeedComponent to use for shared seed.")]
     public WorldSeedComponent seedSource;
 
@@ -12,8 +13,8 @@ public class PlateTectonicsComponent : MonoBehaviour
     public VoronoiComponent voronoiSource;
 
     [Header("Flow Settings (visual only)")]
-    [Range(1, 20)]
-    public int arrowSizePixels = 4;
+    [Range(1, 100)]
+    public int arrowSizePixels = 20;
 
     [Range(1, 10)]
     public int arrowThickness = 1;
@@ -22,57 +23,44 @@ public class PlateTectonicsComponent : MonoBehaviour
     public Texture2D debugTexture;
 
     [System.Serializable]
-    public struct RegionDebugData
+    public struct RegionFlowData
     {
         public int regionId;
         public Vector2 center;
         public Vector2 direction;
     }
 
-    public List<RegionDebugData> regionsDebug = new List<RegionDebugData>();
+    private List<RegionFlowData> regionsFlowData = new List<RegionFlowData>();
+    #endregion
 
     public Dictionary<int, Vector2> GetRegionFlowDirections() 
     {
         var dict = new Dictionary<int, Vector2>();
-        foreach (var rd in regionsDebug)
+        foreach (var rd in regionsFlowData)
         {
             dict[rd.regionId] = rd.direction;
         }
         return dict;
     }
 
-    public void GenerateNow()
+
+    public void CreateFlowDirectionsOnVoronoiMap()
     {
-        if (voronoiSource == null)
-            voronoiSource = GetComponent<VoronoiComponent>();
-
-        if (seedSource == null)
-            seedSource = GetComponent<WorldSeedComponent>();
-
-        if (voronoiSource == null)
-        {
-            Debug.LogWarning("FlowField: No VoronoiComponent found on this GameObject.");
-            return;
+        VoronoiGenerator.VoronoiResult voroData;
+        int seedToUse;
+        if (!CanGenerateFlow(out voroData, out seedToUse))
+        { 
+            return; 
         }
-
-        var voroData = voronoiSource.GetLastResult();
-        if (voroData.regionMap == null || voroData.seeds == null || voroData.seeds.Length == 0)
-        {
-            Debug.LogWarning("FlowField: Voronoi data is empty. Generating Voronoi.");
-            voronoiSource.CreateVoronoiMap();
-            voroData = voronoiSource.GetLastResult();
-        }
-
-        int seedToUse = (seedSource != null) ? seedSource.worldSeed : 0;
 
         // build flow vectors using shared seed
-        var flowField = FlowFieldData.GenerateFromVoronoi(voroData, seedToUse);
+        var flowField = FlowFieldData.GenerateFlowFieldFromVoronoi(voroData, seedToUse);
 
-        regionsDebug.Clear();
+        regionsFlowData.Clear();
         foreach (var kvp in flowField.flowPerRegion)
         {
             var info = kvp.Value;
-            regionsDebug.Add(new RegionDebugData
+            regionsFlowData.Add(new RegionFlowData
             {
                 regionId = info.regionId,
                 center = info.center,
@@ -88,7 +76,41 @@ public class PlateTectonicsComponent : MonoBehaviour
         if (debugTexture != null) debugTexture.Apply();
 #endif
 
-        Debug.Log($"FlowField: generated {regionsDebug.Count} flow vectors using shared seed {seedToUse}.");
+        Debug.Log($"FlowField: generated {regionsFlowData.Count} flow vectors using shared seed {seedToUse}.");
+    }
+
+    private bool CanGenerateFlow(out VoronoiGenerator.VoronoiResult voroData, out int seedToUse)
+    {
+        if (voronoiSource == null)
+        { 
+            voronoiSource = GetComponent<VoronoiComponent>(); 
+        }
+
+        if (seedSource == null)
+        { 
+            seedSource = GetComponent<WorldSeedComponent>(); 
+        }
+
+        if (voronoiSource == null)
+        {
+            Debug.LogWarning("FlowField: No VoronoiComponent found on this GameObject. But was expected.");
+            voroData = default;
+            seedToUse = 0;
+            return false;
+        }
+
+        voroData = voronoiSource.GetLastResult();
+        
+        if (voroData.regionMap == null || voroData.seeds == null || voroData.seeds.Length == 0)
+        {
+            Debug.LogWarning("FlowField: Voronoi data is empty. Generating Voronoi.");
+            voronoiSource.CreateVoronoiMap();
+            voroData = voronoiSource.GetLastResult();
+        }
+
+        seedToUse = (seedSource != null) ? seedSource.worldSeed : 0;
+
+        return true;
     }
 
     private Texture2D BuildDebugTexture(
